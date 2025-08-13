@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from urllib.error import URLError
 from urllib.request import urlopen
 
-from horizon.l1_entities.models import now_utc
+from horizon.l1_entities import now_utc
 from horizon.l2_use_cases.boundaries.weather_provider_gateway import WeatherProviderGateway, WeatherSample
 
 

@@ -1,33 +1,34 @@
 """ComputeSky interactor."""
 
+from dataclasses import dataclass
 from datetime import UTC, datetime
 
-from horizon.l1_entities.atmospheric_scattering import atmospheric_sky_colors
-from horizon.l1_entities.color_effects import (
+from horizon.l1_entities import (
+    Heuristics,
+    SkySnapshot,
     apply_air_quality_effect,
     apply_light_pollution_effect,
     apply_overcast_effect,
     apply_turbidity_effect,
     apply_weather_effects,
+    atmospheric_sky_colors,
+    classify_regime,
+    derive,
+    sun_position,
 )
-from horizon.l1_entities.heuristics import Heuristics
-from horizon.l1_entities.heuristics import derive as derive_heuristics
-from horizon.l1_entities.models import SkySnapshot
-from horizon.l1_entities.regimes import classify_regime
-from horizon.l1_entities.sun import sun_position
 
 from .boundaries.location_service import LocationGateway
-from .boundaries.prefs_gateway import IPreferencesGateway
-from .boundaries.presenter import ISkyPresenter
+from .boundaries.prefs_gateway import PreferencesGateway
+from .boundaries.presenter import SkyPresenter
 from .boundaries.weather_provider_gateway import WeatherProviderGateway
 
 
 class ComputeSkyUseCase:
     def __init__(
         self,
-        presenter: ISkyPresenter,
+        presenter: SkyPresenter,
         location_service: LocationGateway,
-        prefs: IPreferencesGateway,
+        prefs: PreferencesGateway,
         weather: WeatherProviderGateway | None = None,
     ):
         self.presenter = presenter
@@ -79,7 +80,7 @@ class ComputeSkyUseCase:
         # Always start with atmospheric scattering as the base
         horizon, zenith = atmospheric_sky_colors(sun.altitude_deg)
         # Derive heuristics for effect application
-        heur = derive_heuristics(lat_round, lon_round, now)
+        heur = derive(lat_round, lon_round, now)
 
         # Apply atmospheric effects based on influence toggles
         # Each effect is applied only if its influence toggle is enabled
@@ -175,3 +176,38 @@ def _derive_aqi(heur: Heuristics) -> int:
     # Add overcast penalty reducing AQI slightly (rain/clouds can scavenge particulates)
     raw *= 1.0 - 0.2 * heur.overcast
     return int(max(0, min(500, round(raw))))
+
+
+@dataclass
+class ComputeSkyResponse:
+    """Response object containing computed sky data and metadata."""
+
+    snapshot: SkySnapshot | None
+    success: bool
+    error_message: str | None = None
+
+    @classmethod
+    def success_response(cls, snapshot: SkySnapshot) -> 'ComputeSkyResponse':
+        """Create a successful response."""
+        return cls(snapshot=snapshot, success=True, error_message=None)
+
+    @classmethod
+    def error_response(cls, error_message: str) -> 'ComputeSkyResponse':
+        """Create an error response."""
+        return cls(snapshot=None, success=False, error_message=error_message)
+
+
+@dataclass
+class ComputeSkyRequest:
+    """Request object for computing sky colors."""
+
+    # Optional overrides for location and time
+    lat: float | None = None
+    lon: float | None = None
+    override_time: datetime | None = None
+
+    # Optional preference overrides
+    location_precision_deg: float | None = None
+    influence_light_pollution: bool | None = None
+    influence_weather: bool | None = None
+    influence_air_quality: bool | None = None

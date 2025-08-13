@@ -4,10 +4,10 @@ import json
 from pathlib import Path
 from typing import Any
 
-from horizon.l2_use_cases.boundaries.prefs_gateway import IPreferencesGateway, Preferences
+from horizon.l2_use_cases.boundaries.prefs_gateway import Preferences, PreferencesGateway
 
 
-class JsonPreferencesGateway(IPreferencesGateway):
+class JsonPreferencesGateway(PreferencesGateway):
     def __init__(self, path: Path):
         self.path = path
 

@@ -27,7 +27,7 @@ from AppKit import (  # type: ignore
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from horizon.l2_use_cases.boundaries.prefs_gateway import IPreferencesGateway
+from horizon.l2_use_cases.boundaries.prefs_gateway import PreferencesGateway
 from horizon.l3_interface_adapters.presenters.sky_presenter import SkyViewModel
 
 
@@ -58,7 +58,7 @@ class MenuApp(rumps.App):
     def __init__(
         self,
         *,
-        prefs_gateway: IPreferencesGateway | None = None,
+        prefs_gateway: PreferencesGateway | None = None,
         on_prefs_changed: Callable[[], None] | None = None,
         prefs_file_path: Path | None = None,
     ) -> None:

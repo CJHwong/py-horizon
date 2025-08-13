@@ -1,14 +1,14 @@
 """Location gateway with preferences-aware fallback and caching."""
 
-from horizon.l1_entities.models import round_coord
+from horizon.l1_entities import round_coord
 from horizon.l2_use_cases.boundaries.location_service import Location, LocationGateway
-from horizon.l2_use_cases.boundaries.prefs_gateway import IPreferencesGateway
+from horizon.l2_use_cases.boundaries.prefs_gateway import PreferencesGateway
 
 
 class CachedLocationGateway(LocationGateway):
     """Location gateway that only uses IP location when preferences don't provide coordinates."""
 
-    def __init__(self, inner: LocationGateway, prefs_gateway: IPreferencesGateway):
+    def __init__(self, inner: LocationGateway, prefs_gateway: PreferencesGateway):
         self._inner = inner
         self._prefs_gateway = prefs_gateway
         self._last: Location | None = None

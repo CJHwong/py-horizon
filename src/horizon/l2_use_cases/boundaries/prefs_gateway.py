@@ -17,6 +17,6 @@ class Preferences:
     influence_air_quality: bool = True
 
 
-class IPreferencesGateway(Protocol):
+class PreferencesGateway(Protocol):
     def load(self) -> Preferences: ...
     def save(self, prefs: Preferences) -> None: ...

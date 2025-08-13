@@ -9,7 +9,7 @@ Source: https://www.shadertoy.com/view/slSXRW)
 
 import math
 
-from .colors import Color
+from horizon.l1_entities.color.colors import Color
 
 # Type alias for Vec3
 Vec3 = tuple[float, float, float]

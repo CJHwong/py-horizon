@@ -1,7 +1,7 @@
-from horizon.l1_entities.regimes import SkyRegime, classify_regime
+from horizon.l1_entities import SkyRegime, classify_regime
 
 
-def test_regime_thresholds():
+def test_regime_thresholds() -> None:
     assert classify_regime(12) == SkyRegime.DAY
     assert classify_regime(2) == SkyRegime.LOW_SUN
     assert classify_regime(-3) == SkyRegime.CIVIL

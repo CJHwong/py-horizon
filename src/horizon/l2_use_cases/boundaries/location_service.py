@@ -1,13 +1,8 @@
 """Location service boundary."""
 
-from dataclasses import dataclass
 from typing import Protocol
 
-
-@dataclass(frozen=True)
-class Location:
-    lat: float
-    lon: float
+from horizon.l1_entities import Location
 
 
 class LocationGateway(Protocol):

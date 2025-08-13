@@ -1,9 +1,9 @@
 from datetime import UTC, datetime
 
-from horizon.l1_entities.heuristics import derive
+from horizon.l1_entities import derive
 
 
-def test_heuristics_deterministic():
+def test_heuristics_deterministic() -> None:
     dt = datetime(2025, 8, 11, tzinfo=UTC)
     h1 = derive(40.0, -100.0, dt)
     h2 = derive(40.0, -100.0, dt)

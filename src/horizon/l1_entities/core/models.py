@@ -3,10 +3,19 @@
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
-from .colors import Color
-from .heuristics import Heuristics
+from horizon.l1_entities.atmospheric.heuristics import Heuristics
+from horizon.l1_entities.color.colors import Color
+from horizon.l1_entities.geo.sun import SunPosition
+
 from .regimes import SkyRegime
-from .sun import SunPosition
+
+
+@dataclass(frozen=True)
+class Location:
+    """Geographic coordinates."""
+
+    lat: float
+    lon: float
 
 
 @dataclass(frozen=True)

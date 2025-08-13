@@ -1,7 +1,8 @@
 from datetime import UTC, datetime
+from typing import Any
 
 from horizon.l2_use_cases.boundaries.location_service import Location, LocationGateway
-from horizon.l2_use_cases.boundaries.prefs_gateway import IPreferencesGateway, Preferences
+from horizon.l2_use_cases.boundaries.prefs_gateway import Preferences, PreferencesGateway
 from horizon.l2_use_cases.compute_sky_use_case import ComputeSkyUseCase
 from horizon.l3_interface_adapters.presenters.sky_presenter import InMemorySkyPresenter
 
@@ -10,22 +11,22 @@ class FixedLocation(LocationGateway):
     def __init__(self, lat: float, lon: float):
         self._loc = Location(lat=lat, lon=lon)
 
-    def current_location(self):  # type: ignore[override]
+    def current_location(self) -> Location:
         return self._loc
 
 
-class InMemoryPrefs(IPreferencesGateway):
+class InMemoryPrefs(PreferencesGateway):
     def __init__(self, prefs: Preferences):
         self._prefs = prefs
 
-    def load(self):  # type: ignore[override]
+    def load(self) -> Preferences:
         return self._prefs
 
-    def save(self, prefs: Preferences):  # type: ignore[override]
+    def save(self, prefs: Preferences) -> None:
         self._prefs = prefs
 
 
-def test_minimal_mode_disables_non_astronomical_influences(monkeypatch):
+def test_minimal_mode_disables_non_astronomical_influences(monkeypatch: Any) -> None:
     # Force multiple executions with different dates to ensure deterministic anchors unchanged by heuristics
     base_prefs = Preferences(
         influence_light_pollution=False,
@@ -43,7 +44,7 @@ def test_minimal_mode_disables_non_astronomical_influences(monkeypatch):
 
         class _DT:
             @staticmethod
-            def now(tz=None):
+            def now(tz: Any = None) -> datetime:
                 return fake_now
 
         monkeypatch.setattr('horizon.l2_use_cases.compute_sky_use_case.datetime', _DT)

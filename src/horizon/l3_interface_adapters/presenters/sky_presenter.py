@@ -2,8 +2,8 @@
 
 from dataclasses import dataclass
 
-from horizon.l1_entities.models import SkySnapshot
-from horizon.l2_use_cases.boundaries.presenter import ISkyPresenter
+from horizon.l1_entities import SkySnapshot
+from horizon.l2_use_cases.boundaries.presenter import SkyPresenter
 
 
 @dataclass
@@ -23,7 +23,7 @@ class SkyViewModel:
     air_quality_index: int | None = None
 
 
-class InMemorySkyPresenter(ISkyPresenter):
+class InMemorySkyPresenter(SkyPresenter):
     def __init__(self) -> None:
         self.latest: SkyViewModel | None = None
 

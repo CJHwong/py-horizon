@@ -2,9 +2,9 @@
 
 from typing import Protocol
 
-from horizon.l1_entities.models import SkySnapshot
+from horizon.l1_entities import SkySnapshot
 
 
-class ISkyPresenter(Protocol):
+class SkyPresenter(Protocol):
     def present(self, snapshot: SkySnapshot) -> None:  # side-effect (update view model / UI adapter)
         ...
