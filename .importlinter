@@ -1,0 +1,58 @@
+[importlinter]
+root_package = horizon
+
+[importlinter:contract:1]
+name = "Forbidden L1 to L2 imports"
+type = forbidden
+source_modules =
+    horizon.l1_entities
+forbidden_modules =
+    horizon.l2_use_cases
+    horizon.l3_interface_adapters
+    horizon.l4_frameworks_and_drivers
+
+[importlinter:contract:2]
+name = "Forbidden L2 to L3/L4 imports"
+type = forbidden
+source_modules =
+    horizon.l2_use_cases
+forbidden_modules =
+    horizon.l3_interface_adapters
+    horizon.l4_frameworks_and_drivers
+
+[importlinter:contract:3]
+name = "Forbidden L3 to L4 imports"
+type = forbidden
+source_modules =
+    horizon.l3_interface_adapters
+forbidden_modules =
+    horizon.l4_frameworks_and_drivers
+
+[importlinter:contract:4]
+name = "Entity subdomain isolation - atmospheric"
+type = forbidden
+source_modules =
+    horizon.l1_entities.atmospheric
+forbidden_modules =
+    horizon.l1_entities.core
+    horizon.l1_entities.geo
+
+[importlinter:contract:5]
+name = "Entity subdomain isolation - color"
+type = forbidden
+source_modules =
+    horizon.l1_entities.color
+forbidden_modules =
+    horizon.l1_entities.core
+    horizon.l1_entities.atmospheric
+    horizon.l1_entities.geo
+
+[importlinter:contract:6]
+name = "Entity subdomain isolation - geo"
+type = forbidden
+source_modules =
+    horizon.l1_entities.geo
+forbidden_modules =
+    horizon.l1_entities.core
+    horizon.l1_entities.atmospheric
+    horizon.l1_entities.color

@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "ruff", "mypy>=1.17.1"]
+dev = ["pytest", "ruff", "mypy>=1.17.1", "pre-commit"]
 
 [project.scripts]
 py-horizon = "horizon.main:run_loop"
