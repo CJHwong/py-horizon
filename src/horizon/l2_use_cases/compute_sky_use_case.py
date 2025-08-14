@@ -131,9 +131,8 @@ class ComputeSkyUseCase:
                         )
 
         # 3. Air quality effects
-        air_quality_index = None
+        air_quality_index = _derive_aqi(heur)
         if getattr(prefs, 'influence_air_quality', True):
-            air_quality_index = _derive_aqi(heur)
             horizon, zenith = apply_air_quality_effect(horizon, zenith, air_quality_index)
         # Compute final colors and snapshot
         avg = horizon.lerp(zenith, 0.5)
