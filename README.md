@@ -121,34 +121,54 @@ The application classifies sky conditions into distinct regimes based on solar a
 
 ## Architecture
 
-`py-horizon` follows Clean Architecture with strict dependency rules:
+The codebase strictly follows Clean Architecture with four layers:
 
-### Layer Structure
+### L1 Entities (`src/horizon/l1_entities/`)
 
-```text
-src/
-├── l1_entities/                # Pure domain logic (innermost)
-│   ├── sun.py                  # Solar position calculations
-│   ├── colors.py               # Color space transformations
-│   ├── atmospheric_scattering.py # Physical sky scattering simulation
-│   ├── color_effects.py        # Atmospheric effect filters
-│   ├── regimes.py              # Sky classification
-│   ├── heuristics.py           # Atmospheric parameter derivation
-│   └── models.py               # Core data structures
-├── l2_use_cases/               # Application workflows
-│   ├── compute_sky_use_case.py
-│   └── boundaries/             # Protocol interfaces
-├── l3_interface_adapters/      # External system adapters
-│   ├── gateways/               # Data access implementations
-│   └── presenters/             # View model conversion
-└── l4_frameworks_and_drivers/  # Platform-specific (outermost)
-    ├── menu_app.py             # macOS menu bar UI
-    └── scheduler.py            # Dynamic timing system
-```
+Pure domain logic and mathematical computations, organized into sub-modules:
+
+- `geo/sun.py`: Solar position calculations (NOAA algorithms)
+- `color/colors.py`: Color space transformations and gradient generation
+- `color/color_effects.py`: Color transformation and gradient effects
+- `core/regimes.py`: Sky classification by sun altitude (DAY, LOW_SUN, CIVIL, NAUTICAL, ASTRONOMICAL, NIGHT)
+- `atmospheric/heuristics.py`: Atmospheric parameter derivation (turbidity, overcast, light pollution)
+- `atmospheric/atmospheric_scattering.py`: Physical single-scattering atmospheric simulation engine
+- `core/models.py`: Core data structures (`SkySnapshot`, coordinate utilities)
+- `exceptions.py`: Domain-specific exceptions
+
+### L2 Use Cases (`src/horizon/l2_use_cases/`)
+
+Application workflows and business rules:
+
+- `compute_sky_use_case.py`: Main interactor orchestrating sky computation
+- `boundaries/`: Protocol interfaces for external dependencies (location, weather, preferences, presenter)
+
+### L3 Interface Adapters (`src/horizon/l3_interface_adapters/`)
+
+Transform between use cases and external concerns:
+
+- `presenters/sky_presenter.py`: Converts domain models to view models with hex colors
+- `gateways/json_prefs_gateway.py`: JSON preferences file adapter
+- `gateways/cached_location_gateway.py`: Location service with caching and privacy rounding
+- `gateways/ip_location_gateway.py`: IP-based location fallback
+- `gateways/open_meteo_weather_gateway.py`: Optional weather integration (no API key)
+
+### L4 Frameworks & Drivers (`src/horizon/l4_frameworks_and_drivers/`)
+
+Platform-specific implementations:
+
+- `menu_app.py`: macOS menu bar UI using rumps/pyobjc
+- `scheduler.py`: Dynamic timing for smooth twilight transitions
+
+### Application Entry Points
+
+- `src/horizon/main.py`: Application composition root and entry points
+- `src/horizon/container.py`: Dependency injection container
+- `src/horizon/app_orchestrator.py`: Application orchestration and lifecycle management
 
 ### Dependency Rule
 
-All dependencies point inward. Inner layers never import from outer layers.
+Inner layers never import from outer layers. All dependencies point inward toward entities.
 
 ## Development
 
@@ -163,6 +183,26 @@ uv run pytest --cov=src
 
 # Run specific test
 uv run pytest tests/test_atmospheric_scattering.py
+```
+
+### Test Structure
+
+```
+tests/
+├── unit/                        # Unit tests for individual components
+│   ├── entities/
+│   │   ├── test_atmospheric_scattering.py # Physical sky model testing
+│   │   ├── test_heuristics.py            # Atmospheric parameter testing
+│   │   ├── test_regimes.py               # Sky regime classification testing
+│   │   ├── test_sun.py                   # Solar position testing
+│   │   └── test_sun_accuracy.py          # Solar calculation accuracy testing
+│   ├── adapters/
+│   │   └── test_location_service.py      # Location service testing
+│   ├── frameworks/               # Framework-specific unit tests
+│   └── use_cases/                # Use case unit tests
+└── integration/                  # Integration and end-to-end tests
+    ├── test_influence_toggles.py # Feature toggle testing
+    └── test_pipeline.py          # End-to-end integration testing
 ```
 
 ### Code Quality
