@@ -24,7 +24,7 @@ from AppKit import (  # type: ignore
     NSMakeRect,
     NSPNGFileType,
 )
-from watchdog.events import FileSystemEventHandler
+from watchdog.events import DirModifiedEvent, FileModifiedEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
 from horizon.l2_use_cases.boundaries.prefs_gateway import PreferencesGateway
@@ -38,8 +38,8 @@ class _PrefsFileWatcher(FileSystemEventHandler):
         self.prefs_path = prefs_path
         self.on_change = on_change
 
-    def on_modified(self, event):
-        if not event.is_directory and Path(event.src_path).name == self.prefs_path.name:
+    def on_modified(self, event: DirModifiedEvent | FileModifiedEvent) -> None:
+        if not event.is_directory and Path(str(event.src_path)).name == self.prefs_path.name:
             self.on_change()
 
 
@@ -122,6 +122,18 @@ class MenuApp(rumps.App):
         setattr(p, attr, not current)
         self._prefs_gateway.save(p)
         sender.state = 1 if not current else 0
+
+    def _update_influence_item_states(self) -> None:
+        """Update menu item states from prefs."""
+        if not self._prefs_gateway:
+            return
+        p = self._prefs_gateway.load()
+        for attr, item in self._influence_items.items():
+            item.state = 1 if getattr(p, attr, False) else 0
+
+    def _on_prefs_file_modified(self) -> None:
+        """Callback for when prefs file is modified."""
+        self._update_influence_item_states()
         if self._on_prefs_changed:
             self._on_prefs_changed()
 
@@ -135,7 +147,7 @@ class MenuApp(rumps.App):
             return
 
         # Set up file watcher
-        event_handler = _PrefsFileWatcher(self._prefs_file_path, self._on_prefs_changed)
+        event_handler = _PrefsFileWatcher(self._prefs_file_path, self._on_prefs_file_modified)
         observer = Observer()
         observer.schedule(event_handler, str(self._prefs_file_path.parent), recursive=False)
         observer.start()
@@ -204,9 +216,9 @@ class MenuApp(rumps.App):
         except Exception:  # pragma: no cover
             pass
 
-    def run(self) -> None:
+    def run(self, **options: Any) -> None:
         self._start_file_watching()
-        super().run()
+        super().run(**options)
 
 
 def _hex_to_rgb_f(hex_str: str) -> tuple[float, float, float]:
