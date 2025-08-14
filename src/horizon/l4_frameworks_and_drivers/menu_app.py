@@ -76,6 +76,7 @@ class MenuApp(rumps.App):
         self._turbidity_item = rumps.MenuItem('Turbidity: …')
         self._light_pollution_item = rumps.MenuItem('Light Pollution: …')
         self._weather_item = rumps.MenuItem('Weather: No data')
+        self._aqi_item = rumps.MenuItem('AQI: No data')
         # Settings submenu (dictionary form)
         quit_item = rumps.MenuItem('Quit', callback=self._on_quit)
         self.menu = [
@@ -87,6 +88,7 @@ class MenuApp(rumps.App):
             self._turbidity_item,
             self._light_pollution_item,
             self._weather_item,
+            self._aqi_item,
             None,
             *self._build_settings_menu(),
             None,
@@ -179,9 +181,12 @@ class MenuApp(rumps.App):
             weather_bits.append(f'{vm.temperature_c:.1f}°C')
         if getattr(vm, 'weather_summary', None):
             weather_bits.append(str(vm.weather_summary))
-        if getattr(vm, 'air_quality_index', None) is not None:
-            weather_bits.append(f'AQI {vm.air_quality_index}')
         self._weather_item.title = 'Weather: ' + (' • '.join(weather_bits) if weather_bits else 'No data')
+        # AQI item
+        if getattr(vm, 'air_quality_index', None) is not None:
+            self._aqi_item.title = _format_aqi(vm.air_quality_index)
+        else:
+            self._aqi_item.title = 'AQI: No data'
         # Gradient icon for menu item
         try:
             key = (vm.horizon_hex, vm.zenith_hex)
@@ -219,6 +224,23 @@ class MenuApp(rumps.App):
     def run(self, **options: Any) -> None:
         self._start_file_watching()
         super().run(**options)
+
+
+def _format_aqi(aqi: int) -> str:
+    """Format AQI value with a descriptive level."""
+    if aqi <= 50:
+        level = 'Good'
+    elif aqi <= 100:
+        level = 'Moderate'
+    elif aqi <= 150:
+        level = 'Unhealthy for Sensitive Groups'
+    elif aqi <= 200:
+        level = 'Unhealthy'
+    elif aqi <= 300:
+        level = 'Very Unhealthy'
+    else:
+        level = 'Hazardous'
+    return f'AQI: {aqi} ({level})'
 
 
 def _hex_to_rgb_f(hex_str: str) -> tuple[float, float, float]:
