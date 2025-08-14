@@ -41,3 +41,7 @@ repos:
         language: python
         additional_dependencies: [import-linter>=2.0]
         entry: bash -c 'PYTHONPATH=src lint-imports --verbose'
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: ''  # Use the sha / tag you want to point at
+    hooks:
+      - id: mypy
