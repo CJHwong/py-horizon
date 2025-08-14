@@ -2,6 +2,8 @@
 
 A macOS menu bar application that renders dynamic sky gradients using only local data (time + location) and deterministic heuristics.
 
+![horizon_screenshot](https://github.com/user-attachments/assets/3d53a1e2-7d55-4dcf-83e3-6973b85db956)
+
 ## Features
 
 - **🌅 Physics-based sky simulation**: Complete single-scattering atmospheric model with realistic color rendering
