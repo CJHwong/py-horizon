@@ -31,31 +31,18 @@ uvx --from git+https://github.com/CJHwong/py-horizon.git py-horizon &
 nohup uvx --from git+https://github.com/CJHwong/py-horizon.git py-horizon > /dev/null 2>&1 &
 ```
 
-#### Using uv (for development)
+#### Using uvx (for development)
 
 ```bash
 # Clone the repository
 git clone https://github.com/CJHwong/py-horizon.git
 cd py-horizon
 
-# Install dependencies
-uv sync --all-extras
-
 # Run once (prints gradient colors to console)
-uv run python -c "import src.main; src.main.run_once()"
+uvx --from . py-horizon-once
 
 # Run menu bar app
-uv run python -c "import src.main; src.main.run_loop()"
-```
-
-#### Using pip
-
-```bash
-# Install for development
-pip install -e ".[dev]"
-
-# Run the application
-python -c "import src.main; src.main.run_once()"
+uvx --from . py-horizon
 ```
 
 ### First Run
